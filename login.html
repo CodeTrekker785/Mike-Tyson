@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login | Tyson Celebrity Brokerage</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --black: #0a0a0a;
+            --gray: #1a1a1a;
+            --input-bg: #222;
+        }
+
+        body {
+            background-color: var(--black);
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Subtle radial gradient for depth */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: var(--gray);
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: white;
+            box-sizing: border-box;
+            transition: border 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>Secure Access</h2>
+    
+    <div class="input-group">
+        <label for="email">Institutional Email</label>
+        <input id="email" type="email" placeholder="name@company.com">
+    </div>
+
+    <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••">
+    </div>
+
+    <button id="loginBtn" onclick="handleLogin()">Login to Dashboard</button>
+    <div id="error" class="error-msg"></div>
+</div>
+
+<script>
+async function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('loginBtn');
+    const errorDiv = document.getElementById('error');
+
+    if (!email || !password) {
+        showError("Please enter all credentials.");
+        return;
+    }
+
+    // UI State: Loading
+    btn.disabled = true;
+    btn.innerText = "Authenticating...";
+    errorDiv.style.display = "none";
+
+    try {
+        const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            localStorage.setItem('id', data.id);
+            // Redirect based on role
+            window.location.href = data.role === "admin" 
+                ? "/dashboard/admin.html" 
+                : "/dashboard/user.html";
+        } else {
+            showError(data.error || "Authentication failed.");
+        }
+    } catch (err) {
+        showError("Connection error. Please try again later.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Login to Dashboard";
+    }
+}
+
+function showError(msg) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.innerText = msg;
+    errorDiv.style.display = "block";
+}
+</script>
+
+</body>
+</html>
