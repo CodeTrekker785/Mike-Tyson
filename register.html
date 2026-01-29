@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Membership | Tyson Celebrity Brokerage</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --black: #0a0a0a;
+            --gray: #1a1a1a;
+            --input-bg: #222;
+            --text-muted: #888;
+        }
+
+        body {
+            background-color: var(--black);
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 50px 40px;
+            background: var(--gray);
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 35px;
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 10px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: white;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: #2a2a2a;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--gold);
+            border: none;
+            color: var(--black);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #e5c158;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            display: block;
+            margin-top: 25px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .login-link:hover {
+            color: var(--gold);
+        }
+
+        .disclaimer {
+            font-size: 10px;
+            color: #444;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-card">
+    <h2>Membership</h2>
+    <span class="subtitle">Secure Registration Portal</span>
+    
+    <div class="input-group">
+        <label for="email">Institutional Email</label>
+        <input id="email" type="email" placeholder="client@tysonbrokerage.com">
+    </div>
+
+    <div class="input-group">
+        <label for="password">Create Secure Password</label>
+        <input id="password" type="password" placeholder="••••••••••••">
+    </div>
+
+    <button id="regBtn" onclick="handleRegister()">Request Access</button>
+    
+    <a href="/login.html" class="login-link">Already have an account? Sign In</a>
+
+    <div class="disclaimer">
+        By registering, you agree to our Private Placement Terms and Non-Disclosure Agreements. 
+        Entry is subject to identity verification.
+    </div>
+</div>
+
+<script>
+async function handleRegister() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('regBtn');
+
+    if (!email || !password) {
+        alert("Credentials required for verification.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Verifying...";
+
+    try {
+        const response = await fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Membership registration successful. Please log in.");
+            window.location.href = "/login.html";
+        } else {
+            alert(data.error || "Registration declined.");
+            btn.disabled = false;
+            btn.innerText = "Request Access";
+        }
+    } catch (err) {
+        alert("System error. Please try again.");
+        btn.disabled = false;
+        btn.innerText = "Request Access";
+    }
+}
+</script>
+
+</body>
+</html>
